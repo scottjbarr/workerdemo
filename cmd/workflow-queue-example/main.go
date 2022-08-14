@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -14,9 +14,10 @@ import (
 )
 
 type Config struct {
-	InputQueueURL string `envconfig:"INPUT_QUEUE_URL"`
-	DodgyQueueURL string `envconfig:"DODGY_QUEUE_URL"`
-	FinalQueueURL string `envconfig:"FINAL_QUEUE_URL"`
+	InputQueueURL string  `envconfig:"INPUT_QUEUE_URL"`
+	Threshold     float64 `envconfig:"THRESHOLD"`
+	DodgyQueueURL string  `envconfig:"DODGY_QUEUE_URL"`
+	FinalQueueURL string  `envconfig:"FINAL_QUEUE_URL"`
 }
 
 func main() {
@@ -26,24 +27,36 @@ func main() {
 		panic(err)
 	}
 
-	log.Printf("starting with config %+v", cfg)
+	log.Printf("INFO starting with config %+v", cfg)
 
 	// queues
-	queueInput := queue.NewSQSQueue(cfg.InputQueueURL)
-	queueDodgy := queue.NewSQSQueue(cfg.DodgyQueueURL)
-	queueFinal := queue.NewSQSQueue(cfg.FinalQueueURL)
+	queueInput, err := queue.New(cfg.InputQueueURL)
+	if err != nil {
+		panic(err)
+	}
+
+	queueDodgy, err := queue.New(cfg.DodgyQueueURL)
+	if err != nil {
+		panic(err)
+	}
+
+	queueFinal, err := queue.New(cfg.FinalQueueURL)
+	if err != nil {
+		panic(err)
+	}
 
 	// workers
 	inputWorker := NewInputWorker(queueInput, queueDodgy)
-	dodgyWorker := NewDodgyWorker(queueDodgy, queueFinal)
+	dodgyWorker := NewDodgyWorker(cfg.Threshold, queueDodgy, queueFinal)
 	finalWorker := NewFinalWorker(queueFinal)
 
-	workers := []*queue.Worker{
-		inputWorker.Worker,
-		dodgyWorker.Worker,
-		finalWorker.Worker,
+	workers := []queue.Runner{
+		inputWorker,
+		dodgyWorker,
+		finalWorker,
 	}
 
+	// start the workers in goroutines
 	for i := range workers {
 		go func(i int) {
 			if err := workers[i].Start(); err != nil {
@@ -62,16 +75,17 @@ func main() {
 	// wait for a signal to stop
 	go func() {
 		sig := <-sigs
-		log.Printf("received signal %v", sig)
+		log.Printf("INFO received signal %v", sig)
 		done <- true
 	}()
 
-	// wait
-	log.Printf("running until signalled")
+	// run until receiving a signal to stop
+	log.Printf("INFO running until signalled")
 	<-done
 
-	log.Printf("stopping")
+	log.Printf("INFO stopping")
 
+	// stop the workers
 	for _, w := range workers {
 		w.Stop()
 	}
@@ -83,22 +97,6 @@ type Work struct {
 	Value     string `json:"value"`
 	Timestamp int64  `json:"ts"`
 }
-
-// func NewWork(v int64) Work {
-// 	return Work{
-// 		Value: v,
-// 	}
-// }
-
-// func (w Work) JSON() string {
-// 	return fmt.Sprintf(`{"value":%v}`, w.Value)
-// }
-
-// func newMessage(s string) queue.Message {
-// 	return queue.Message{
-// 		Payload: s,
-// 	}
-// }
 
 type InputWorker struct {
 	Writer queue.Writer
@@ -126,13 +124,15 @@ func (w *InputWorker) Handle(m queue.Message) error {
 }
 
 type DodgyWorker struct {
-	Writer queue.Writer
+	Threshold float64
+	Writer    queue.Writer
 	*queue.Worker
 }
 
-func NewDodgyWorker(r queue.ReceivingAcker, writer queue.Writer) *DodgyWorker {
+func NewDodgyWorker(threshold float64, r queue.ReceivingAcker, writer queue.Writer) *DodgyWorker {
 	w := DodgyWorker{
-		Writer: writer,
+		Threshold: threshold,
+		Writer:    writer,
 	}
 
 	w.Worker = queue.NewWorker("DodgyWorker", r, w.Handle)
@@ -144,8 +144,8 @@ func (w *DodgyWorker) Handle(m queue.Message) error {
 	// log.Printf("INFO DodgyWorker received %+v", m.Payload)
 
 	// random number
-	if rand.Float64() < 0.9 {
-		return errors.New("DodgyWorker received less than 0.9")
+	if rand.Float64() < w.Threshold {
+		return fmt.Errorf("received less than %0.1f", w.Threshold)
 	}
 
 	log.Printf("INFO DodgyWorker processed ok")
