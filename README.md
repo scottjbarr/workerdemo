@@ -1,6 +1,6 @@
-# Workflow Queue
+# Worker Demo
 
-A demo showing how a few queues can be used together in a workflow.
+A demo showing how a few queues can be used together to acheive a single goal.
 
 The example has 3 queue workers running from binary, but you could run these workers
 separately.  This would be a benefit to resilience and scaling.
@@ -8,7 +8,7 @@ separately.  This would be a benefit to resilience and scaling.
 This demo makes heavy use of my [queue](https://github.com/scottjbarr/queue) package but any
 implementation would do.
 
-The demo uses 3 workers
+The demo uses 3 workers to demonstrate multiple workers in a single system.
 
 - InputWorker
 - DodgyWorker
@@ -38,6 +38,8 @@ Reads from an "input" queue, writes to a "dodgy" queue.
 ### DodgyWorker
 
 Reads from the dodgy queue. It has a configurable failure threshold, between 0 and 1.
+
+This worker is built to demonstrate failure.
 
 When processing each message a random number is generated. If the random number is below the threshold the job fails.  Failure will cause the message to be processed again later.
 
