@@ -1,4 +1,4 @@
-module github.com/scottjbarr/workflowqueue
+module github.com/scottjbarr/workerdemo
 
 go 1.19
 

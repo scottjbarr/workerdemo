@@ -6,10 +6,6 @@ GO_BUILD = go build
 # command to compiling the distributable. Specify GOOS and GOARCH for the target OS.
 GO_DIST = go build # GOOS=linux GOARCH=amd64 go build
 
-DB_DRIVER = postgres
-DB_URL ?= "host=/var/run/postgresql user=scott dbname=dividends_test sslmode=disable"
-GOOSE = goose -dir ./db $(DB_DRIVER) "$(DB_URL)"
-
 .PHONY: dist
 
 all: clean prepare dist
@@ -21,7 +17,7 @@ prepare:
 	mkdir -p dist
 
 run:
-	go run cmd/workflow-queue-example/main.go
+	go run cmd/worker-demo/main.go
 
 enqueue:
 	./scripts/send.sh
@@ -29,7 +25,7 @@ enqueue:
 install:
 	$(GO) install ./cmd/...
 
-dist: workflow-queue-example
+dist: worker-demo
 
-workflow-queue-example:
-	$(GO_DIST) -o dist/workflow-queue-example cmd/workflow-queue-example/main.go
+worker-demo:
+	$(GO_DIST) -o dist/worker-demo cmd/worker-demo/main.go
