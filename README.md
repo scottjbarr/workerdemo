@@ -14,6 +14,10 @@ The demo uses 3 workers
 - DodgyWorker
 - FinalWorker
 
+## Config
+
+See [example.env](conf/example.env).
+
 ## The queue
 
 The demo uses SQS as this is a "reliable" queue system, requiring messages to be "ack'ed" by
