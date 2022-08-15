@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/scottjbarr/config v0.0.4
-	github.com/scottjbarr/queue v1.1.0
+	github.com/scottjbarr/queue v1.1.1
 )
 
 require (
