@@ -36,8 +36,8 @@ github.com/scottjbarr/config v0.0.4 h1:8j0HPgeMlydGAU31VoYQulCNZXTBRByAtUcgTEq3I
 github.com/scottjbarr/config v0.0.4/go.mod h1:Lgh8sJ83blUUmygCo9NnWb1Em/dyUZ4FOYm8LgtG8hw=
 github.com/scottjbarr/middleware v0.0.1 h1:mJPIHISp2JkfR/BRyYZzcapZ/hzONaaj5fWsW91slWQ=
 github.com/scottjbarr/middleware v0.0.1/go.mod h1:JuMnPKPI9kBaoFhvwy8qm7sbsYyr+s3fiKFJo0KNb0A=
-github.com/scottjbarr/queue v1.1.1 h1:IbFbVBX/exp+fYzEzz+cEKbPdHM3Po5iYXTcVAxVzD8=
-github.com/scottjbarr/queue v1.1.1/go.mod h1:dxui6AwEn3iqS79x7FnhCgI+6bJmnK0KfQTtd0aDDQ4=
+github.com/scottjbarr/queue v1.1.2 h1:MX4nO3mKn1/z8AAEOWUWvucsj8YCSj93XnLbMNsGiZo=
+github.com/scottjbarr/queue v1.1.2/go.mod h1:dxui6AwEn3iqS79x7FnhCgI+6bJmnK0KfQTtd0aDDQ4=
 github.com/scottjbarr/redis v1.0.0 h1:KGS1pZ/5Nha18zNL0TaHT5JR5bKt37iFwQ9xEiHsogs=
 github.com/scottjbarr/redis v1.0.0/go.mod h1:HIzxEkRRpIDMZHOU/iavqyd+uQeQwqQncXoYpqJdGgM=
 github.com/scottjbarr/storage v0.0.1 h1:+fOttC2um98auOsfco/BQeA4VAAwFqeBkJi69VvR6YE=
